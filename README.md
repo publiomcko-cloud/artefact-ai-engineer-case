@@ -1,10 +1,10 @@
 # Artefact AI Engineer Technical Case
 
-This repository contains the initial project bootstrap for the Artefact AI Engineer technical case. The case describes a customer-service assistant for Empório da Música, backed by the provided store datasets and policy manual.
+This repository contains the Artefact AI Engineer technical case MVP for Empório da Música, backed by the supplied store datasets and policy manual.
 
 ## Current scope
 
-This initial commit establishes the repository structure, keeps the supplied runtime data unchanged, and records the planned MVP in [docs/MVP_SPEC.md](docs/MVP_SPEC.md). Application features have not been implemented yet.
+Phase 1 implements the deterministic data loader, product search and lookup, sellability checks, promotion lookup, and offer pricing. The provided source data remains unchanged. LLM integration, policy retrieval, order behavior, and the chat interface are planned later phases and are not implemented here.
 
 ## Environment
 
@@ -29,4 +29,4 @@ Copy `.env.example` to `.env` when a later implementation requires model configu
 
 ## Next implementation phase
 
-Begin with deterministic loading and validation of the structured data, followed by product, promotion, and order rules. Keep LLM integration, policy retrieval, and the user interface for their later phases as described in the specification.
+The next phase is policy retrieval from the provided store manual. Continue to follow the implementation order and scope in [docs/MVP_SPEC.md](docs/MVP_SPEC.md).
