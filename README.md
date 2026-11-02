@@ -4,7 +4,7 @@ This repository contains the Artefact AI Engineer technical case MVP for Empóri
 
 ## Current scope
 
-Phase 1 implements deterministic product and promotion behavior. Phase 2 adds section-aware extraction and FAISS retrieval for the store-policy PDF. Phase 3 adds deterministic, customer-verified order lookup. Policy retrieval returns evidence only; it does not generate answers. The provided source data remains unchanged.
+Phase 1 implements the deterministic product and promotion layer. Phase 2 adds policy retrieval from the store-policy PDF. Phase 3 adds verified deterministic order lookup. Phase 4 adds single-agent LangGraph orchestration over those tools. Policy retrieval returns evidence only; it does not generate answers. The provided source data remains unchanged.
 
 ## Environment
 
@@ -16,7 +16,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_EMBEDDING_MODEL` before using live policy retrieval. Set `OPENAI_BASE_URL` only when using an OpenAI-compatible endpoint. The tests use a deterministic local embedder and require no API key or network access. Do not commit `.env` or API keys.
+Copy `.env.example` to `.env` and set `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_EMBEDDING_MODEL` for the chat agent and live policy retrieval. Set `OPENAI_BASE_URL` only when using an OpenAI-compatible endpoint. The tests use injected local models/retrievers and require no API key or network access. Do not commit `.env` or API keys.
 
 ## Tests
 
@@ -29,7 +29,7 @@ pytest -q
 ## Project structure
 
 - `data/` — six source CSV datasets and the store policies PDF.
-- `src/` — validated store data, deterministic product/promotion/order tools, and policy retrieval; agent modules remain future work.
+- `src/` — validated store data, deterministic tools, policy retrieval, and single-agent orchestration.
 - `tests/` — focused deterministic product, promotion, order privacy, and policy retrieval tests.
 - `evals/` — placeholder for the optional behavioral evaluation suite.
 - `examples/` — placeholder for conversations to be captured after the application exists.
@@ -37,4 +37,4 @@ pytest -q
 
 ## Next implementation phase
 
-The next phase is single-agent LangGraph integration described in [docs/MVP_SPEC.md](docs/MVP_SPEC.md). It is not part of this implementation.
+The Streamlit chat interface remains the next phase. It is not part of this implementation.
