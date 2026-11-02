@@ -135,6 +135,11 @@ class StoreData:
                 dtype["price_brl"] = "string"
             elif filename == "promotions.csv":
                 dtype["discount_percent"] = "string"
+            elif filename == "orders.csv":
+                dtype["total_brl"] = "string"
+                dtype["tracking_code"] = "string"
+                dtype["estimated_delivery"] = "string"
+                dtype["notes"] = "string"
 
             try:
                 frame = pd.read_csv(path, dtype=dtype or None)
@@ -170,15 +175,22 @@ class StoreData:
                         )
 
             for column in DECIMAL_COLUMNS.get(filename, ()):
-                for row_number, value in enumerate(frame[column], start=1):
-                    amount = _decimal_value(
+                amounts = [
+                    _decimal_value(
                         value, filename=filename, column=column, row_number=row_number
                     )
-                    if filename == "promotions.csv" and not Decimal("0") <= amount <= Decimal("100"):
-                        raise DataLoadError(
-                            "Invalid dataset 'promotions.csv': discount_percent must be "
-                            f"between 0 and 100 (invalid value at data row {row_number})."
-                        )
+                    for row_number, value in enumerate(frame[column], start=1)
+                ]
+                if filename == "orders.csv":
+                    # Keep historical currency exact from CSV text onward.
+                    frame[column] = amounts
+                elif filename == "promotions.csv":
+                    for row_number, amount in enumerate(amounts, start=1):
+                        if not Decimal("0") <= amount <= Decimal("100"):
+                            raise DataLoadError(
+                                "Invalid dataset 'promotions.csv': discount_percent must be "
+                                f"between 0 and 100 (invalid value at data row {row_number})."
+                            )
 
             if filename == "promotions.csv":
                 frame["is_active"] = [

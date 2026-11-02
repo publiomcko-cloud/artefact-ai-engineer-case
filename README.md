@@ -4,7 +4,7 @@ This repository contains the Artefact AI Engineer technical case MVP for Empóri
 
 ## Current scope
 
-Phase 1 implements the deterministic data loader, product search and lookup, sellability checks, promotion lookup, and offer pricing. Phase 2 adds section-aware extraction and FAISS retrieval for the store-policy PDF. Policy retrieval returns evidence only; it does not generate answers. LLM integration, order behavior, and the chat interface are later phases and are not implemented here. The provided source data remains unchanged.
+Phase 1 implements deterministic product and promotion behavior. Phase 2 adds section-aware extraction and FAISS retrieval for the store-policy PDF. Phase 3 adds deterministic, customer-verified order lookup. Policy retrieval returns evidence only; it does not generate answers. The provided source data remains unchanged.
 
 ## Environment
 
@@ -29,12 +29,12 @@ pytest -q
 ## Project structure
 
 - `data/` — six source CSV datasets and the store policies PDF.
-- `src/` — placeholders for the planned data, agent, tool, and retrieval modules.
-- `tests/` — placeholders for the planned deterministic business-rule tests.
+- `src/` — validated store data, deterministic product/promotion/order tools, and policy retrieval; agent modules remain future work.
+- `tests/` — focused deterministic product, promotion, order privacy, and policy retrieval tests.
 - `evals/` — placeholder for the optional behavioral evaluation suite.
 - `examples/` — placeholder for conversations to be captured after the application exists.
 - `docs/MVP_SPEC.md` — scope, architecture, repository layout, and implementation plan.
 
 ## Next implementation phase
 
-The next phase is the single-agent integration described in [docs/MVP_SPEC.md](docs/MVP_SPEC.md). It is not part of this implementation.
+The next phase is single-agent LangGraph integration described in [docs/MVP_SPEC.md](docs/MVP_SPEC.md). It is not part of this implementation.
