@@ -35,7 +35,8 @@ flowchart TD
 - `app.py` — Streamlit entry point.
 - `data/` — six supplied CSV files and the store policy PDF.
 - `src/agent/` — system prompt, state, tools, and LangGraph orchestration.
-- `src/tools/` — deterministic product, promotion, order, and policy tool adapters.
+- `src/tools/` — deterministic product, promotion, and protected-order business logic.
+- `src/agent/tools.py` — JSON-safe agent-facing tool wrappers, including policy retrieval.
 - `src/rag/` — policy PDF extraction, embeddings, and FAISS retrieval.
 - `tests/` — offline data, business-rule, agent, UI-helper, and eval-runner tests.
 - `evals/` — live behavioral cases, runner, and qualification record.
@@ -49,6 +50,8 @@ Use Python 3.11 or 3.12.
 ### Ubuntu, Linux, and macOS
 
 ```bash
+git clone https://github.com/publiomcko-cloud/artefact-ai-engineer-case.git
+cd artefact-ai-engineer-case
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -58,22 +61,24 @@ cp .env.example .env
 ### Windows PowerShell
 
 ```powershell
+git clone https://github.com/publiomcko-cloud/artefact-ai-engineer-case.git
+cd artefact-ai-engineer-case
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Set these variables in `.env`:
+Copy `.env.example` to `.env`, then set only your API key for the validated Gemini configuration:
 
 ```dotenv
-OPENAI_API_KEY=your-provider-key
-OPENAI_MODEL=your-chat-model
-OPENAI_EMBEDDING_MODEL=your-embedding-model
-OPENAI_BASE_URL=
+OPENAI_API_KEY=your-gemini-api-key
+OPENAI_MODEL=gemini-3.5-flash-lite
+OPENAI_EMBEDDING_MODEL=gemini-embedding-001
+OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 ```
 
-`OPENAI_API_KEY` is passed to the native Gemini chat integration. `OPENAI_BASE_URL` is optional and applies to the OpenAI-compatible Gemini embedding endpoint; chat completion uses the configured Gemini model directly. Keep `.env` local and never commit it.
+`OPENAI_API_KEY` is passed to the native Gemini chat integration. The validated policy-embedding path uses the Gemini OpenAI-compatible endpoint shown above, so keep `OPENAI_BASE_URL` set to that value when reproducing the qualified configuration. Keep `.env` local and never commit it.
 
 ## Running
 
@@ -128,9 +133,11 @@ Order verification is a lightweight MVP privacy gate, not production authenticat
 - A matching email or phone is enough for the case’s MVP verification flow; this is not an account-authentication design.
 - Conversation context lasts for the current Streamlit session only.
 
-## Phase 6 status
+## Final qualification status
 
 `PHASE_6_COMPLETE_READY_FOR_SUBMISSION_ARTIFACT`
+
+Final validation: **107 offline automated tests passed**, **17/17 provider-backed behavioral records passed**, and the live Streamlit smoke passed.
 
 The native Gemini chat model completed a real LangGraph tool cycle through `ToolNode` and a follow-up model response. The live suite passed all 12 required scenarios, an additional PIX follow-up, and all four robustness probes (17/17 records, no blocked calls). A live Streamlit smoke verified app startup, input, a product price response, the PIX follow-up, hidden tool messages, and the new-conversation reset. The sanitized scenario-by-scenario record is in [`evals/live_results.md`](evals/live_results.md), and [`examples/conversations.md`](examples/conversations.md) contains five provider-backed conversations using only the synthetic case data.
 

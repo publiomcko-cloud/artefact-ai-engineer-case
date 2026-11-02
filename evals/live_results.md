@@ -5,7 +5,7 @@
 - Chat model: `gemini-3.5-flash-lite` via `ChatGoogleGenerativeAI`
 - Embedding model: `gemini-embedding-001` via the configured OpenAI-compatible Gemini endpoint
 - Completed scenarios: 17; passed: 17; failed: 0; blocked: 0
-- E2E-10/E2E-11 were re-run together after clarifying that the verified follow-up requests status and total. E2E-04, E2E-12, R-01, and R-04 were re-run after adding accepted equivalent answer cues. All four targeted reruns passed.
+- Targeted reruns confirmed multi-turn order verification and semantically equivalent customer-facing wording. Wording matchers were broadened only to recognize equivalent phrasing; required tools, structured facts, privacy constraints, and business expectations were unchanged. All targeted reruns passed.
 - Earlier OpenAI-compatible chat attempts that ended in HTTP 503/400 were provider compatibility blocks and are excluded from behavioral failure counts.
 - Credentials, private verification values, chain-of-thought, and raw framework messages are omitted.
 

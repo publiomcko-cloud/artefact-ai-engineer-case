@@ -1,5 +1,9 @@
 # Artefact AI Engineer Technical Case — MVP Specification
 
+## Final implementation status
+
+> **Completed and qualified.** This document began as the implementation plan and remains as the design record. The final implementation is authoritative where a planned signature or phase label evolved during delivery. All acceptance criteria in Section 25 were demonstrated before submission. The external submission PDF is delivered through the recruiting form and is intentionally not committed to this repository.
+
 ## 1. Purpose
 
 This document defines the implementation scope for the Artefact **AI Engineer – Full-Stack for Generative AI Applications** technical case.
@@ -219,15 +223,16 @@ artefact-ai-engineer-case/
 │   ├── agent/
 │   │   ├── graph.py
 │   │   ├── prompt.py
-│   │   └── state.py
+│   │   ├── state.py
+│   │   └── tools.py
 │   |
 │   ├── tools/
 │   │   ├── products.py
 │   │   ├── promotions.py
-│   │   ├── orders.py
-│   │   └── policies.py
+│   │   └── orders.py
 │   |
 │   └── rag/
+│       ├── embeddings.py
 │       ├── ingest.py
 │       └── retriever.py
 |
@@ -437,11 +442,17 @@ Suggested output:
 }
 ```
 
-### 9.4 `verify_order_identity`
+### 9.4 Internal order verification
 
-Purpose: provide a minimal privacy gate before exposing order details.
+`verify_order_identity(order_id, email=None, phone=None)` is a deterministic internal privacy gate. It verifies the supplied email and/or phone against the customer associated with the requested order and returns an opaque, order-bound proof. That proof is process-private and is never serialized into model messages or exposed as an agent tool result.
 
-Input:
+`get_order_status(order_id, verification)` accepts only a valid proof created by the verification function and re-checks that the proof matches the current order/customer relationship.
+
+This is intentionally a lightweight MVP control, not production authentication.
+
+### 9.5 `lookup_order` agent-facing tool
+
+The LLM sees only one safe order tool:
 
 ```python
 order_id: int
@@ -449,31 +460,9 @@ email: str | None = None
 phone: str | None = None
 ```
 
-The order is verified only if the supplied customer information matches the customer associated with the order.
+The wrapper internally performs identity verification and protected order retrieval. If identity information is missing or incorrect, it returns a generic verification result without protected order data. On success it returns only allowed fields for that order, such as status, historical total, date, payment method, optional tracking/estimated delivery, and item names/quantities.
 
-This is intentionally a lightweight MVP control, not production authentication.
-
-### 9.5 `get_order_status`
-
-Purpose: return order information only after successful verification.
-
-Input:
-
-```python
-order_id: int
-verified_customer_id: int
-```
-
-Output may include:
-
-- order ID
-- order status
-- order total
-- order date
-- shipment/tracking data if present
-- order items
-
-Do not return unrelated customer PII.
+The private verification proof, customer ID, customer record, contact details, and order notes are never returned to the LLM.
 
 ### 9.6 `search_policy`
 
@@ -933,18 +922,17 @@ Mention production extensions without implementing them unnecessarily.
 
 ## 22. Environment Configuration
 
-`.env.example`:
+The committed `.env.example` reflects the configuration used for final qualification:
 
 ```text
 OPENAI_API_KEY=
-OPENAI_MODEL=<tool-capable-model>
-```
-
-Optionally:
-
-```text
+OPENAI_MODEL=gemini-3.5-flash-lite
+OPENAI_EMBEDDING_MODEL=gemini-embedding-001
+OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 LOG_LEVEL=INFO
 ```
+
+The chat model uses the native Gemini LangChain integration. Policy embeddings use the Gemini OpenAI-compatible endpoint. The evaluator only needs to supply a valid Gemini API key to reproduce the qualified configuration.
 
 Do not commit secrets.
 
@@ -1003,48 +991,48 @@ The MVP is ready for submission only when all of the following are true.
 
 ### Application
 
-- [ ] `streamlit run app.py` starts successfully from the documented setup.
-- [ ] User can hold a text conversation with the agent.
-- [ ] Agent can search products.
-- [ ] Agent can report authoritative current prices.
-- [ ] Agent can correctly handle stock/status edge cases.
-- [ ] Agent can evaluate active promotions.
-- [ ] Agent correctly handles PIX versus promotion non-cumulation.
-- [ ] Agent can answer policy questions from the provided PDF.
-- [ ] Agent can handle order-status requests with identity verification.
-- [ ] Agent does not fabricate tracking information.
-- [ ] Agent handles unrelated questions appropriately.
+- [x] `streamlit run app.py` starts successfully from the documented setup.
+- [x] User can hold a text conversation with the agent.
+- [x] Agent can search products.
+- [x] Agent can report authoritative current prices.
+- [x] Agent can correctly handle stock/status edge cases.
+- [x] Agent can evaluate active promotions.
+- [x] Agent correctly handles PIX versus promotion non-cumulation.
+- [x] Agent can answer policy questions from the provided PDF.
+- [x] Agent can handle order-status requests with identity verification.
+- [x] Agent does not fabricate tracking information.
+- [x] Agent handles unrelated questions appropriately.
 
 ### Engineering
 
-- [ ] LLM does not receive the full raw customer/order dataset.
-- [ ] Structured operational facts come from deterministic tools.
-- [ ] Currency calculations use `Decimal`.
-- [ ] RAG is limited to policy/document knowledge.
-- [ ] Architecture remains single-agent.
-- [ ] Core tests pass with `pytest -q`.
+- [x] LLM does not receive the full raw customer/order dataset.
+- [x] Structured operational facts come from deterministic tools.
+- [x] Currency calculations use `Decimal`.
+- [x] RAG is limited to policy/document knowledge.
+- [x] Architecture remains single-agent.
+- [x] Core tests pass with `pytest -q`.
 
 ### Repository
 
-- [ ] Repository is public.
-- [ ] Git history contains meaningful incremental commits.
-- [ ] `.env.example` exists.
-- [ ] No secrets are committed.
-- [ ] README is complete and in English.
-- [ ] 3–5 example conversations are committed.
-- [ ] Setup instructions have been tested from a clean environment.
+- [x] Repository is public.
+- [x] Git history contains meaningful incremental commits.
+- [x] `.env.example` exists.
+- [x] No secrets are committed.
+- [x] README is complete and in English.
+- [x] 3–5 example conversations are committed.
+- [x] Setup instructions have been tested from a clean environment.
 
 ### Submission
 
-- [ ] Submission PDF is in English.
-- [ ] PDF contains the public repository link.
-- [ ] PDF uses the requested naming convention.
+- [x] Submission PDF is in English.
+- [x] PDF contains the public repository link.
+- [x] PDF uses the requested naming convention.
 
 ---
 
-## 26. Implementation Order
+## 26. Original Implementation Order (Planning Record)
 
-Implement strictly in this order to reduce risk.
+The following was the original implementation plan. Delivery was later split into smaller, independently validated commits; the Git history and README describe the completed sequence. The architectural intent remained unchanged.
 
 ### Phase 1 — Deterministic data layer
 
