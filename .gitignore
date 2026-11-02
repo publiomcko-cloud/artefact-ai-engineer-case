@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Generated vector-store artifacts
+.vectorstore/
+vectorstore/
+faiss_index/
+*.faiss
+*.pkl
+*.pickle
+*.index
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
