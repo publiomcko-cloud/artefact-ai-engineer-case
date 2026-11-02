@@ -63,7 +63,27 @@ class OpenAIEmbedder:
             model=self.model,
             input=list(texts),
         )
-        ordered = sorted(response.data, key=lambda item: item.index)
-        if len(ordered) != len(texts):
+        items = list(response.data)
+        indices = [getattr(item, "index", None) for item in items]
+        if len(items) != len(texts):
             raise ValueError("The embeddings provider returned an unexpected result count.")
+        if all(index is None for index in indices):
+            # Some OpenAI-compatible endpoints omit indexes but preserve request order.
+            ordered = items
+        elif all(
+            isinstance(index, int) and not isinstance(index, bool)
+            for index in indices
+        ) and sorted(indices) == list(range(len(texts))):
+            ordered = [item for _, item in sorted(zip(indices, items))]
+        elif any(index is None for index in indices) and all(
+            index is None or index == position
+            for position, index in enumerate(indices)
+        ):
+            # Preserve the response array when every supplied index confirms its
+            # position and only some index fields are absent.
+            ordered = items
+        else:
+            raise ValueError(
+                "The embeddings provider returned missing or invalid response indices."
+            )
         return [list(item.embedding) for item in ordered]

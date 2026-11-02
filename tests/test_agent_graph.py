@@ -9,6 +9,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from src.agent.graph import (
     GENERIC_MODEL_FAILURE,
     ModelConfigurationError,
+    _create_chat_model,
     build_agent,
 )
 from src.agent.prompt import SYSTEM_PROMPT
@@ -328,3 +329,54 @@ def test_model_configuration_requires_key_and_model_without_network(
 
     with pytest.raises(ModelConfigurationError, match="OPENAI_API_KEY and OPENAI_MODEL"):
         build_agent()
+
+
+def test_default_chat_factory_uses_native_gemini_adapter_and_existing_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import langchain_google_genai
+
+    captured: dict[str, object] = {}
+    expected_model = object()
+
+    class GeminiModelDouble:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setattr("src.agent.graph.load_dotenv", lambda: None)
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_MODEL", "gemini-3.5-flash-lite")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://embedding-endpoint.example/v1")
+    monkeypatch.setattr(
+        langchain_google_genai,
+        "ChatGoogleGenerativeAI",
+        GeminiModelDouble,
+    )
+
+    model = _create_chat_model()
+
+    assert isinstance(model, GeminiModelDouble)
+    assert captured == {
+        "model": "gemini-3.5-flash-lite",
+        "api_key": "test-key",
+        "retries": 1,
+        "request_timeout": 45,
+    }
+    assert "base_url" not in captured
+
+
+def test_injected_fake_model_does_not_construct_live_gemini_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+    store_data: StoreData,
+) -> None:
+    model = ScriptedChatModel([AIMessage(content="Hello from the offline fake.")])
+    monkeypatch.setattr(
+        "src.agent.graph._create_chat_model",
+        lambda: pytest.fail("live Gemini model factory should not be used"),
+    )
+
+    result = _build(model, store_data).invoke(
+        {"messages": [HumanMessage(content="Hello")]}
+    )
+
+    assert result["messages"][-1].content == "Hello from the offline fake."

@@ -28,25 +28,26 @@ def _create_chat_model() -> Any:
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     model_name = os.getenv("OPENAI_MODEL", "").strip()
-    base_url = os.getenv("OPENAI_BASE_URL", "").strip() or None
     if not api_key or not model_name:
         raise ModelConfigurationError(
             "Set OPENAI_API_KEY and OPENAI_MODEL before starting the chat agent."
         )
     try:
-        from langchain_openai import ChatOpenAI
+        from langchain_google_genai import ChatGoogleGenerativeAI
 
-        options: dict[str, str] = {"model": model_name, "api_key": api_key}
-        if base_url is not None:
-            options["base_url"] = base_url
-        return ChatOpenAI(**options)
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            api_key=api_key,
+            retries=1,
+            request_timeout=45,
+        )
     except ImportError:
         raise ModelConfigurationError(
-            "The langchain-openai package is required for the chat agent."
+            "The langchain-google-genai package is required for the chat agent."
         ) from None
     except Exception:
         raise ModelConfigurationError(
-            "The configured chat model could not be initialized. Check OPENAI_MODEL and OPENAI_BASE_URL."
+            "The configured Gemini chat model could not be initialized. Check OPENAI_MODEL and OPENAI_API_KEY."
         ) from None
 
 

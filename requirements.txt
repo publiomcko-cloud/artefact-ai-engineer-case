@@ -8,5 +8,6 @@ faiss-cpu
 openai
 langgraph
 langchain-core
-langchain-openai
+langchain-google-genai>=4.4.2,<5
 streamlit
+PyYAML

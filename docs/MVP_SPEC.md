@@ -161,7 +161,8 @@ Use the minimum stack required to demonstrate the solution clearly.
 - Streamlit
 - LangGraph
 - LangChain core/tool abstractions as needed
-- OpenAI-compatible chat model with tool calling
+- Gemini chat model with tool calling through the native LangChain integration
+- OpenAI-compatible client for Gemini embeddings
 - Pandas
 - Pydantic
 - PyMuPDF
@@ -174,8 +175,9 @@ Use the minimum stack required to demonstrate the solution clearly.
 ```text
 streamlit
 langgraph
-langchain
-langchain-openai
+langchain-core
+langchain-google-genai
+openai
 pandas
 pydantic
 pymupdf
