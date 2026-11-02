@@ -4,7 +4,7 @@ This repository contains the Artefact AI Engineer technical case MVP for Empóri
 
 ## Current scope
 
-Phase 1 implements the deterministic product and promotion layer. Phase 2 adds policy retrieval from the store-policy PDF. Phase 3 adds verified deterministic order lookup. Phase 4 adds single-agent LangGraph orchestration over those tools. Policy retrieval returns evidence only; it does not generate answers. The provided source data remains unchanged.
+Phase 1 implements the deterministic product and promotion layer. Phase 2 adds policy retrieval from the store-policy PDF. Phase 3 adds verified deterministic order lookup. Phase 4 adds single-agent LangGraph orchestration over those tools. Phase 5 adds the Streamlit chat interface. Policy retrieval returns evidence only; it does not generate answers. The provided source data remains unchanged.
 
 ## Environment
 
@@ -26,6 +26,14 @@ Run the complete automated suite with:
 pytest -q
 ```
 
+## Run
+
+Start the local chat interface with:
+
+```bash
+streamlit run app.py
+```
+
 ## Project structure
 
 - `data/` — six source CSV datasets and the store policies PDF.
@@ -37,4 +45,4 @@ pytest -q
 
 ## Next implementation phase
 
-The Streamlit chat interface remains the next phase. It is not part of this implementation.
+Behavioral evaluations, example conversations, and final submission documentation remain for the later completion phase.
