@@ -4,7 +4,7 @@ This repository contains the Artefact AI Engineer technical case MVP for Empóri
 
 ## Current scope
 
-Phase 1 implements the deterministic data loader, product search and lookup, sellability checks, promotion lookup, and offer pricing. The provided source data remains unchanged. LLM integration, policy retrieval, order behavior, and the chat interface are planned later phases and are not implemented here.
+Phase 1 implements the deterministic data loader, product search and lookup, sellability checks, promotion lookup, and offer pricing. Phase 2 adds section-aware extraction and FAISS retrieval for the store-policy PDF. Policy retrieval returns evidence only; it does not generate answers. LLM integration, order behavior, and the chat interface are later phases and are not implemented here. The provided source data remains unchanged.
 
 ## Environment
 
@@ -16,7 +16,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` when a later implementation requires model configuration. Do not commit `.env` or API keys.
+Copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_EMBEDDING_MODEL` before using live policy retrieval. Set `OPENAI_BASE_URL` only when using an OpenAI-compatible endpoint. The tests use a deterministic local embedder and require no API key or network access. Do not commit `.env` or API keys.
+
+## Tests
+
+Run the complete automated suite with:
+
+```bash
+pytest -q
+```
 
 ## Project structure
 
@@ -29,4 +37,4 @@ Copy `.env.example` to `.env` when a later implementation requires model configu
 
 ## Next implementation phase
 
-The next phase is policy retrieval from the provided store manual. Continue to follow the implementation order and scope in [docs/MVP_SPEC.md](docs/MVP_SPEC.md).
+The next phase is the single-agent integration described in [docs/MVP_SPEC.md](docs/MVP_SPEC.md). It is not part of this implementation.
